@@ -1,0 +1,60 @@
+# DNS Configuration - BIND9 (Ubuntu)
+
+## 1. named.conf.local
+
+zone "neel.test" {
+type master;
+file "/etc/bind/db.neel.test";
+}
+
+---
+
+## 2. db.neel.test (Zone File)
+
+$TTL    604800
+@       IN      SOA     neel.test. root.neel.test. (
+2         ; Serial
+604800         ; Refresh
+86400         ; Retry
+2419200         ; Expire
+604800 )       ; Negative Cache TTL
+
+@       IN      NS      neel.test.
+@       IN      A       13.203.81.240
+www     IN      A       13.203.81.240
+
+---
+
+## 3. named.conf.options (Important Settings)
+
+options {
+directory "/var/cache/bind";
+
+```
+listen-on { any; };
+allow-query { any; };
+
+recursion yes;
+
+forwarders {
+    8.8.8.8;
+    8.8.4.4;
+};
+
+dnssec-validation auto;
+```
+
+}
+
+---
+
+## 4. Testing Command
+
+dig @127.0.0.1 neel.test
+
+---
+
+## 5. Expected Output
+
+status: NOERROR
+ANSWER: 13.203.81.240
